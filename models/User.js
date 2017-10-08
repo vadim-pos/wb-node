@@ -20,7 +20,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: 'Please supply a name',
     trim: true
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
+});
+
+// Create virtual field 'gravatar' which is not stored in the DB
+userSchema.virtual('gravatar').get(function() {
+  const emailHash = md5(this.email);
+  return `https://gravatar.com/avatar/${emailHash}?s=200`;
 });
 
 // add passport login plugin, use email filed from userSchema for authentication
