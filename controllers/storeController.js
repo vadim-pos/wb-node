@@ -110,3 +110,23 @@ exports.getStoresByTag = async (req, res) => {
 
   res.render('tag', { tags, tag, stores });
 };
+
+
+exports.searchStores = async (req, res) => {
+  // search for stores by 'name' and 'description' fields wich are has been indexed as 'text' in Store model
+  const stores = await Store.find({
+    $text: {
+      $search: req.query.q
+    }
+  }, {
+    // add score field to returning data objects which represents amount of number of coincidences with query
+    score: { $meta: 'textScore' }
+  })
+  .sort({
+    // sort by this new score field
+    score: { $meta: 'textScore' }
+  })
+  // return first 5 stores
+  .limit(5);
+  res.json(stores);
+};
